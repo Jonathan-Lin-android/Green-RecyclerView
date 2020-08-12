@@ -19,6 +19,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,13 +62,44 @@ public class MainActivity extends AppCompatActivity {
          * Use this setting to improve performance if you know that changes in content do not
          * change the child layout size in the RecyclerView
          */
+        // when reupdating/rebinding content does not change list item width/height
         mNumbersList.setHasFixedSize(true);
-
+        //replace adapater with new one when resetting in onOptionMenuItemSelected
         /*
          * The GreenAdapter is responsible for displaying each item in the list.
          */
         mAdapter = new GreenAdapter(NUM_LIST_ITEMS);
-
         mNumbersList.setAdapter(mAdapter);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    /*
+    When you successfully handle a menu item, return true. If you don't handle the menu item,
+    you should call the superclass implementation of onOptionsItemSelected() (the default implementation returns false).
+     */
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int menuItemThatWasSelected = item.getItemId();
+        if (menuItemThatWasSelected == R.id.action_reset) {
+            // reset adapter
+            mAdapter = new GreenAdapter(NUM_LIST_ITEMS);
+            mNumbersList.setAdapter(mAdapter);
+            /*
+              https://stackoverflow.com/questions/12229817/android-how-does-notifydatasetchanged-method-and-listviews-work
+              tldr: looks at the current position of the list and reupdates the data source from the current position.
+                Usage:
+                used when data source changes i.e. adding an item in between the positions that are currently being shown:
+                1, 2, 3, 4, 5, 6: add a an item in beteween 3 and 4 which then pushes the list back one.
+                mAdapter.notifyDataSetChanged();
+                calls getView() for each item being shown.
+             */
+         //   mAdapter.notifyDataSetChanged();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
